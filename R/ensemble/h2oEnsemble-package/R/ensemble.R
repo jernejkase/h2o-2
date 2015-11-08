@@ -48,7 +48,14 @@ function(x, y, data, family = "binomial",
   # Begin ensemble code
   if (is.numeric(seed)) set.seed(seed)  #If seed is specified, set seed prior to next step
   folds <- sample(rep(seq(V), ceiling(N/V)))[1:N]  # Cross-validation folds (stratified folds not yet supported)
-  data$fold_id <- folds  # Add a fold_id column for each observation so we can subset by row later
+  
+  #jk
+  #if data is large, h2o seems to crash
+  #data$fold_id <- folds  # Add a fold_id column for each observation so we can subset by row later
+  folds <- data.frame(fold_id=folds)
+  folds <- as.h2o(folds)
+  data <- h2o.cbind(data,folds)
+  #end js
   
   # Create the Z matrix of cross-validated predictions
   Z <- .make_Z(x=x, y=y, data=data, family=family, 
